@@ -1,0 +1,25 @@
+# Arquivos Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ambiente virtual
+venv/
+.env/
+.venv/
+
+# Arquivos de IDE
+.vscode/
+.idea/
+
+# Arquivos gerados pelo script
+*.pdf
+*.zip
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
+
+# Logs e configurações
+*.log
+*.sqlite 
