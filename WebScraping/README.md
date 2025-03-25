@@ -1,4 +1,4 @@
-# 📂 Repositório: Download de Anexos da ANS
+# 📂 Download de Anexos da ANS
 
 **Script Python para download automático dos Anexos I e II do Rol de Procedimentos da ANS**
 
