@@ -1,4 +1,4 @@
-# 📂 Repositório: Download de Anexos da ANS
+# 📂 Download de Anexos da ANS
 
 **Script Python para download automático dos Anexos I e II do Rol de Procedimentos da ANS**
 
@@ -26,8 +26,8 @@ Disponíveis no portal da [Agência Nacional de Saúde Suplementar](https://www.
 
 ```bash
 # Clone o repositório
-git clone https://github.com/seu-usuario/download-anexos-ans.git
-cd download-anexos-ans
+git clone [https://github.com/Katianefatec/teste_nivelamento.git]
+cd WebScraping
 
 # Instale as dependências
 pip install -r requirements.txt
@@ -38,7 +38,7 @@ pip install -r requirements.txt
 Execute o script com:
 
 ```bash
-python download_anexos.py
+python baixa_pdf.py
 ```
 
 Saída esperada:
