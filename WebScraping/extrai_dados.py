@@ -3,41 +3,64 @@ import pandas as pd
 import zipfile
 import os
 
+def extrair_legenda_do_pdf(pdf_path):
+    """Extrai a legenda do rodapé do PDF"""
+    with pdfplumber.open(pdf_path) as pdf:
+        ultima_pagina = pdf.pages[-1]
+        texto_rodape = ultima_pagina.extract_text() or ""
+        
+        legenda = {}
+        for linha in texto_rodape.split('\n'):
+            linha = linha.strip()
+            if ':' in linha:
+                sigla, descricao = linha.split(':', 1)
+                legenda[sigla.strip()] = descricao.strip()
+        
+        return legenda
+
+def descompactar_zip(caminho_zip, extrair_para, arquivo_necessario):
+    """Descompacta apenas o arquivo necessário do ZIP"""
+    with zipfile.ZipFile(caminho_zip, 'r') as zip_ref:
+        for file in zip_ref.namelist():
+            if file == arquivo_necessario:
+                zip_ref.extract(file, extrair_para)
+
 def extrair_dados_pdf(caminho_pdf):
     """Extrai dados do PDF e retorna uma lista de dicionários"""
     dados = []
-
     with pdfplumber.open(caminho_pdf) as pdf:
         for pagina in pdf.pages:
             texto = pagina.extract_text()
             linhas = texto.split('\n')
-
             for linha in linhas:
-                if "OD" in linha or "AMB" in linha:
-                    partes = linha.split()
+                partes = linha.split()
+                if len(partes) >= 9 and any(sigla in linha for sigla in ["OD", "AMB", "HCO", "HSO", "REF", "PAC", "DUT"]):
                     dados.append({
-                        "Procedimento": " ".join(partes[:-2]),
-                        "OD": partes[-2],
-                        "AMB": partes[-1]
+                        "Procedimento": " ".join(partes[:-8]),
+                        "RN": partes[-8],
+                        "Vigência": partes[-7],
+                        "OD": partes[-6],
+                        "AMB": partes[-5],
+                        "HCO": partes[-4],
+                        "HSO": partes[-3],
+                        "REF": partes[-2],
+                        "PAC": partes[-1]
                     })
-
     return dados
 
-def salvar_csv(dados, caminho_csv):
+def substituir_siglas_por_descricao(df, legenda):
+    """Substitui as siglas pelas descrições completas no DataFrame"""
+    for coluna in df.columns:
+        df[coluna] = df[coluna].apply(lambda x: legenda.get(x, x))
+    return df
+
+def salvar_csv(dados, caminho_csv, legenda):
     """Salva os dados extraídos em um arquivo CSV"""
     df = pd.DataFrame(dados)
-    df['OD'] = df['OD'].replace({'OD': 'Descrição Completa OD'})
-    df['AMB'] = df['AMB'].replace({'AMB': 'Descrição Completa AMB'})
+    df = substituir_siglas_por_descricao(df, legenda)
     
-    # Cria o diretório se não existir
     os.makedirs(os.path.dirname(caminho_csv), exist_ok=True)
-    
-    df.to_csv(caminho_csv, index=False)
-
-def descompactar_zip(caminho_zip, extrair_para):
-    """Descompacta o arquivo ZIP"""
-    with zipfile.ZipFile(caminho_zip, 'r') as zip_ref:
-        zip_ref.extractall(extrair_para)
+    df.to_csv(caminho_csv, index=False, sep=',')
 
 def compactar_arquivo(caminho_arquivo, caminho_zip):
     """Compacta o arquivo em um arquivo ZIP"""
@@ -47,28 +70,26 @@ def compactar_arquivo(caminho_arquivo, caminho_zip):
 def main():
     caminho_zip = "data/Anexos_ANS.zip"
     extrair_para = "data"
-    caminho_pdf = os.path.join(extrair_para, "Anexo_I.pdf")
+    arquivo_necessario = "Anexo_I.pdf"
+    caminho_pdf = os.path.join(extrair_para, arquivo_necessario)
     caminho_csv = "data/Anexo_I.csv"
-    caminho_zip_final = "Teste_Katiane.zip"
+    caminho_zip_final = "data/Teste_Katiane.zip"
 
-    # Descompacta o arquivo ZIP
-    descompactar_zip(caminho_zip, extrair_para)
+    descompactar_zip(caminho_zip, extrair_para, arquivo_necessario)
 
-    # Verifica se o arquivo PDF foi extraído corretamente
     if not os.path.exists(caminho_pdf):
         print(f"Erro: O arquivo {caminho_pdf} não foi encontrado após a extração.")
         return
 
-    # Extrai dados do PDF e salva em CSV
+    legenda = extrair_legenda_do_pdf(caminho_pdf)    
+
     dados = extrair_dados_pdf(caminho_pdf)
-    salvar_csv(dados, caminho_csv)
+    salvar_csv(dados, caminho_csv, legenda)
     print(f"Dados extraídos e salvos em {caminho_csv}")
 
-    # Compacta o arquivo CSV em um arquivo ZIP final
     compactar_arquivo(caminho_csv, caminho_zip_final)
     print(f"Arquivo CSV compactado em {caminho_zip_final}")
 
-    # Remove arquivos temporários
     os.remove(caminho_pdf)
     os.remove(caminho_csv)
 
