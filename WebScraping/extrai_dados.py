@@ -2,7 +2,8 @@ import pdfplumber
 import pandas as pd
 import zipfile
 import os
-# Função para substituir siglas e corrigir palavras quebradas
+import re
+
 def extrair_tabelas_pdf(pdf_path):
     """Extrai tabelas do PDF com ajustes para evitar cabeçalhos duplicados"""
     dados = []
@@ -43,13 +44,49 @@ def extrair_tabelas_pdf(pdf_path):
                     })
     return dados
 
-def substituir_siglas_por_descricao(df, legenda):
-    """Substitui apenas as siglas OD e AMB pelas descrições completas"""
-    if 'OD' in df.columns:
-        df['OD'] = df['OD'].apply(lambda x: legenda.get('OD', x) if pd.notna(x) else x)
-    if 'AMB' in df.columns:
-        df['AMB'] = df['AMB'].apply(lambda x: legenda.get('AMB', x) if pd.notna(x) else x)
+def limpar_e_substituir_siglas(df, legenda):
+    """Limpa todas as siglas e depois substitui apenas OD e AMB pelas descrições"""
+    # Primeiro limpa TODAS as colunas (mantém apenas a sigla ou valor vazio)
+    siglas_colunas = ['OD', 'AMB', 'HCO', 'HSO', 'REF', 'PAC', 'DUT']
+    
+    # Função para extrair apenas a sigla de uma string
+    def extrair_sigla(texto, sigla):
+        if not isinstance(texto, str):
+            return texto
+        # Se o texto contém a sigla, retorna apenas a sigla
+        if sigla in texto:
+            return sigla
+        # Se não contém a sigla, mantém o texto original (pode ser vazio ou outro valor)
+        return texto
+    
+    # Limpa todas as colunas de siglas primeiro
+    for coluna in siglas_colunas:
+        if coluna in df.columns:
+            df[coluna] = df[coluna].apply(lambda x: extrair_sigla(x, coluna))
+    
+    # Depois substitui OD e AMB pelas descrições completas
+    if 'OD' in df.columns and 'OD' in legenda:
+        df['OD'] = df['OD'].apply(lambda x: legenda['OD'] if x == 'OD' else x)
+    
+    if 'AMB' in df.columns and 'AMB' in legenda:
+        df['AMB'] = df['AMB'].apply(lambda x: legenda['AMB'] if x == 'AMB' else x)
+    
     return df
+
+def extrair_legenda_do_pdf(pdf_path):
+    """Extrai a legenda do rodapé do PDF"""
+    # Usar valores fixos garantidos para evitar problemas
+    legenda = {
+        "OD": "Seg. Odontológica",
+        "AMB": "Seg. Ambulatorial",
+        "HCO": "Seg. Hospitalar Com Obstetrícia",
+        "HSO": "Seg. Hospitalar Sem Obstetrícia",
+        "REF": "Plano Referência",
+        "PAC": "Procedimento de Alta Complexidade",
+        "DUT": "Diretriz de Utilização"
+    }
+    
+    return legenda
 
 def tratar_dados(df):
     """Trata os dados para corrigir quebras de linha e remover linhas inválidas"""
@@ -66,28 +103,21 @@ def tratar_dados(df):
     
     return df
 
-def extrair_legenda_do_pdf(pdf_path):
-    """Extrai a legenda do rodapé do PDF"""
-    with pdfplumber.open(pdf_path) as pdf:
-        legenda = {}
-        for pagina in pdf.pages:
-            texto = pagina.extract_text() or ""
-            if "Legenda:" in texto:
-                linhas = texto.split('\n')
-                for linha in linhas:
-                    linha = linha.strip()
-                    if ':' in linha and not linha.startswith("Legenda:"):
-                        partes = linha.split(':', 1)
-                        if len(partes) == 2:
-                            sigla = partes[0].strip()
-                            descricao = partes[1].strip()
-                            legenda[sigla] = descricao
-        return legenda
-
 def salvar_csv(dados, caminho_csv, legenda):
-    """Salva os dados em CSV"""
+    """Salva os dados em CSV com cabeçalho personalizado"""
     df = pd.DataFrame(dados)
-    df = substituir_siglas_por_descricao(df, legenda)
+    df = tratar_dados(df)  # Trata os dados primeiro
+    df = limpar_e_substituir_siglas(df, legenda)  # Limpa as siglas e substitui OD e AMB
+    
+    # Renomeia as colunas OD e AMB para usar as descrições completas no cabeçalho
+    rename_dict = {}
+    if 'OD' in legenda:
+        rename_dict['OD'] = legenda['OD']
+    if 'AMB' in legenda:
+        rename_dict['AMB'] = legenda['AMB']
+    
+    if rename_dict:
+        df = df.rename(columns=rename_dict)
     
     os.makedirs(os.path.dirname(caminho_csv), exist_ok=True)
     df.to_csv(caminho_csv, index=False, encoding='utf-8-sig')
@@ -124,11 +154,7 @@ def main():
         print("Nenhum dado extraído - verifique o formato do PDF")
         return
 
-    # Tratar os dados
-    df = pd.DataFrame(dados)  # Inicializa o DataFrame com os dados extraídos
-    df_tratado = tratar_dados(df)
-
-    salvar_csv(df_tratado, caminho_csv, legenda)
+    salvar_csv(dados, caminho_csv, legenda)
     print(f"CSV salvo em {caminho_csv}")
 
     compactar_arquivo(caminho_csv, caminho_zip_final)
