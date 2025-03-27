@@ -35,7 +35,7 @@ pip install -r requirements.txt
 
 ## 🏆 Como Usar
 
-Download dos PDFS
+### Download dos PDFS
 
 Execute o script com:
 
@@ -53,7 +53,8 @@ Anexo_II.pdf baixado (980.5 KB)
 
 Arquivos compactados em Anexos_ANS.zip
 ```
-Extração de Dados para CSV
+### Extração de Dados para CSV  
+
 Depois de baixar os PDFs, extraia os dados do Anexo I para CSV:
 
 ```bash
