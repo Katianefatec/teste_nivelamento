@@ -15,6 +15,7 @@ venv/
 # Arquivos gerados pelo script
 *.pdf
 *.zip
+*.csv
 
 # Arquivos do sistema
 .DS_Store

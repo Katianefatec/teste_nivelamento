@@ -2,32 +2,12 @@ import pdfplumber
 import pandas as pd
 import zipfile
 import os
-import re
-
 # Função para substituir siglas e corrigir palavras quebradas
-# Função corrigida
-def tratar_dados(df, legenda):
-    # Mantém apenas OD e AMB com descrições usando a legenda
-    if 'OD' in df.columns:
-        df['OD'] = df['OD'].replace({legenda.get('OD', 'OD'): legenda['OD']}, regex=True)
-    if 'AMB' in df.columns:
-        df['AMB'] = df['AMB'].replace({legenda.get('AMB', 'AMB'): legenda['AMB']}, regex=True)
-
-    # Restante do código original...
-    colunas_desejadas = ["PROCEDIMENTO", "RN (alteração)", "VIGÊNCIA", "OD", "AMB",
-                        "HCO", "HSO", "REF", "PAC", "DUT", "SUBGRUPO", "GRUPO", "CAPITULO"]
-    
-    df = df.apply(lambda x: x.str.replace(r',\s?', ' ', regex=True) if x.dtype == "object" else x)
-    df = df[df['PROCEDIMENTO'].str.contains('\S', na=False)]
-    
-    return df[colunas_desejadas]
-
 def extrair_tabelas_pdf(pdf_path):
-    """Extrai tabelas com ajustes de precisão"""
+    """Extrai tabelas do PDF com ajustes para evitar cabeçalhos duplicados"""
     dados = []
     with pdfplumber.open(pdf_path) as pdf:
         for pagina in pdf.pages:
-            # Ajuste fino na detecção de células
             tabelas = pagina.extract_tables({
                 "vertical_strategy": "lines", 
                 "horizontal_strategy": "lines",
@@ -38,10 +18,10 @@ def extrair_tabelas_pdf(pdf_path):
             
             for tabela in tabelas:
                 for linha in tabela:
-                    # Filtra linhas de legenda
-                    if any('Legenda:' in str(cell) for cell in linha):
+                    # Ignora cabeçalhos repetidos
+                    if linha[0] == "PROCEDIMENTO":
                         continue
-                        
+                    
                     # Padroniza número de colunas
                     linha_tratada = [str(cell).strip().replace('\n', ' ') for cell in linha]
                     linha_tratada += [''] * (13 - len(linha))  # Completa com valores vazios
@@ -63,6 +43,29 @@ def extrair_tabelas_pdf(pdf_path):
                     })
     return dados
 
+def substituir_siglas_por_descricao(df, legenda):
+    """Substitui apenas as siglas OD e AMB pelas descrições completas"""
+    if 'OD' in df.columns:
+        df['OD'] = df['OD'].apply(lambda x: legenda.get('OD', x) if pd.notna(x) else x)
+    if 'AMB' in df.columns:
+        df['AMB'] = df['AMB'].apply(lambda x: legenda.get('AMB', x) if pd.notna(x) else x)
+    return df
+
+def tratar_dados(df):
+    """Trata os dados para corrigir quebras de linha e remover linhas inválidas"""
+    # Corrige palavras quebradas
+    for coluna in df.columns:
+        for i in range(1, len(df)):
+            if isinstance(df.at[i, coluna], str) and df.at[i, coluna].strip() and df.at[i, coluna].endswith(','):
+                df.at[i - 1, coluna] = str(df.at[i - 1, coluna]) + ' ' + df.at[i, coluna].rstrip(',')
+                df.at[i, coluna] = ''  # Limpa a linha atual
+    
+    # Remove linhas vazias
+    df = df.dropna(how='all')
+    df = df[df['PROCEDIMENTO'].str.strip().ne('')]
+    
+    return df
+
 def extrair_legenda_do_pdf(pdf_path):
     """Extrai a legenda do rodapé do PDF"""
     with pdfplumber.open(pdf_path) as pdf:
@@ -81,11 +84,10 @@ def extrair_legenda_do_pdf(pdf_path):
                             legenda[sigla] = descricao
         return legenda
 
-
 def salvar_csv(dados, caminho_csv, legenda):
     """Salva os dados em CSV"""
     df = pd.DataFrame(dados)
-    df = tratar_dados(df, legenda)  # Passa a legenda para a função tratar_dados
+    df = substituir_siglas_por_descricao(df, legenda)
     
     os.makedirs(os.path.dirname(caminho_csv), exist_ok=True)
     df.to_csv(caminho_csv, index=False, encoding='utf-8-sig')
@@ -123,8 +125,8 @@ def main():
         return
 
     # Tratar os dados
-    df = pd.DataFrame(dados)
-    df_tratado = tratar_dados(df, legenda)
+    df = pd.DataFrame(dados)  # Inicializa o DataFrame com os dados extraídos
+    df_tratado = tratar_dados(df)
 
     salvar_csv(df_tratado, caminho_csv, legenda)
     print(f"CSV salvo em {caminho_csv}")
