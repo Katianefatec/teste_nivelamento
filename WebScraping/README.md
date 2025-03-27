@@ -26,7 +26,7 @@ Disponíveis no portal da [Agência Nacional de Saúde Suplementar](https://www.
 
 ```bash
 # Clone o repositório
-git clone [https://github.com/Katianefatec/teste_nivelamento.git]
+git clone https://github.com/Katianefatec/teste_nivelamento.git
 cd WebScraping
 
 # Instale as dependências
@@ -34,6 +34,8 @@ pip install -r requirements.txt
 ```
 
 ## 🏆 Como Usar
+
+Download dos PDFS
 
 Execute o script com:
 
@@ -51,13 +53,33 @@ Anexo_II.pdf baixado (980.5 KB)
 
 Arquivos compactados em Anexos_ANS.zip
 ```
+Extração de Dados para CSV
+Depois de baixar os PDFs, extraia os dados do Anexo I para CSV:
+
+```bash
+python extrai_dados.py
+```
+
+Saída esperada:
+```
+Legenda encontrada: {'OD': 'Seg. Odontológica', 'AMB': 'Seg. Ambulatorial', ...}
+Extraídos 3500 registros
+CSV salvo em data/Anexo_I.csv
+Arquivo compactado em data/Teste_Katiane.zip
+```
 
 ## ⚙️ Estrutura do Projeto
 
 ```
 .
-├── baixa_pdf.py     # Script principal
-├── README.md             # Este arquivo
-├── requirements.txt      # Dependências
-└── .gitignore           # Arquivos ignorados
+├── baixa_pdf.py         # Script para download dos PDFs
+├── extrai_dados.py      # Script para extração de dados para CSV
+├── README.md            # Este arquivo
+├── requirements.txt     # Dependências
+├── .gitignore           # Arquivos ignorados
+└── data/                # Diretório para armazenar arquivos
+    ├── Anexos_ANS.zip   # PDFs compactados
+    ├── Anexo_I.csv      # Dados extraídos em formato CSV
+    └── Teste_Katiane.zip # Arquivo CSV compactado
 ```
+> **Nota:** O diretório data não aparece no repositório, pois está no .gitignore
