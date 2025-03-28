@@ -114,6 +114,20 @@ SET
     VL_SALDO_INICIAL = REPLACE(REPLACE(@vl_inicial, ".", ""), ",", "."),
     VL_SALDO_FINAL = REPLACE(REPLACE(@vl_final, ".", ""), ",", ".");
 
+-- Desativar o modo de atualização segura
+SET SQL_SAFE_UPDATES = 0;
+
+-- Atualizar a coluna Descricao_CONTA_CONTABIL para remover espaços extras
+UPDATE demonstracoes_contabeis
+SET Descricao_CONTA_CONTABIL = REPLACE(Descricao_CONTA_CONTABIL, '  ', ' ')
+WHERE Descricao_CONTA_CONTABIL LIKE '%SINISTROS CONHECIDOS%';
+
+UPDATE demonstracoes_contabeis
+SET Descricao_CONTA_CONTABIL = TRIM(Descricao_CONTA_CONTABIL)
+WHERE Descricao_CONTA_CONTABIL LIKE '%SINISTROS CONHECIDOS OU AVISADOS DE ASSISTÊNCIA A SAÚDE MEDICO HOSPITALAR%';
+
+-- Reativar o modo de atualização segura (opcional)
+SET SQL_SAFE_UPDATES = 1;
 
 
     

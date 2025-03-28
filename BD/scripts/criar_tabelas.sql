@@ -23,7 +23,7 @@ CREATE TABLE operadoras (
     Representante VARCHAR(255),
     Cargo_Representante VARCHAR(100),
     Data_Registro_ANS DATE
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Tabela para demonstrações contábeis
 CREATE TABLE demonstracoes_contabeis (
@@ -34,4 +34,4 @@ CREATE TABLE demonstracoes_contabeis (
     VL_SALDO_INICIAL DECIMAL(15, 2),
     VL_SALDO_FINAL DECIMAL(15, 2),
     FOREIGN KEY (Reg_ANS) REFERENCES operadoras(Registro_ANS)
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
