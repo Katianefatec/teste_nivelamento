@@ -46,6 +46,8 @@ Nota: Você pode executar os scripts diretamente no **PowerShell** ou no **Promp
 
 3. Certifique-se de que o usuário MySQL tem permissão para `LOAD DATA INFILE`.
 
+4. É necessário ter gerado o arquivo Relatorio_cadop.csv, presente no diretório WebScraping.
+
 ---
 
 ## 🏆 Como Usar
@@ -73,9 +75,11 @@ Get-Content .\scripts\criar_tabelas.sql | mysql -u root -p ans_db
 ### 2. Importação de Dados
 
 #### No **Prompt de Comando (cmd)**:
+
 Execute o script com:
 ```cmd
-mysql -u root -p ans_db < scripts\importar_dados.sql
+cd BD/scripts
+mysql --local-infile=1 -u root -p ans_db < importar_dados.sql
 ```
 
 #### No **PowerShell**:
@@ -89,6 +93,7 @@ Get-Content .\scripts\importar_dados.sql | mysql -u root -p ans_db
 #### No **Prompt de Comando (cmd)**:
 Execute as consultas com:
 ```cmd
+cd BD/consultas
 mysql -u root -p ans_db < consultas\10OpMaiorDesp4T.sql
 ```
 
