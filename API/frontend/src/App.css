@@ -1,0 +1,44 @@
+.loading-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 9999;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.pagination {
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.table-container {
+  overflow-x: auto;
+  max-height: 600px;
+}
+
+.alert {
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.card-header {
+  padding: 15px;
+  font-weight: 500;
+}
+
+table th {
+  position: sticky;
+  top: 0;
+  background-color: #f8f9fa;
+  z-index: 1;
+}
