@@ -8,10 +8,7 @@
       @buscar="buscarOperadoras" 
     />
     
-    <div v-if="carregando" class="loading-overlay">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Carregando...</span>
-      </div>
+    <div v-if="carregando" class="loading-overlay">      
       <p class="mt-3">Buscando operadoras...</p>
     </div>
     
@@ -157,20 +154,3 @@ export default {
 };
 </script>
 
-<style>
-.loading-overlay {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 40px;
-  border-radius: 8px;
-  background-color: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.spinner-border {
-  width: 3rem;
-  height: 3rem;
-}
-</style>

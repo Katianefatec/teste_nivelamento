@@ -1,7 +1,6 @@
 <template>
   <div>
-    <p>Debug: {{ resultados ? resultados.length : 'undefined' }} resultados encontrados</p>
-    
+       
     <div v-if="resultados && resultados.length > 0" class="card">
       <div class="card-header bg-light d-flex justify-content-between align-items-center">
         <span><strong>{{ total }}</strong> operadoras encontradas</span>

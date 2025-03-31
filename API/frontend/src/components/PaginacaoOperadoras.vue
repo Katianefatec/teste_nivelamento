@@ -1,23 +1,28 @@
 <template>
-  <nav aria-label="Navegação de páginas">
+  <nav class="pagination-container">
     <ul class="pagination">
-      <li class="page-item" :class="{ disabled: paginaAtual <= 1 }">
-        <a class="page-link" href="#" @click.prevent="mudarPagina(paginaAtual - 1)">Anterior</a>
-      </li>
-      
-      <li 
-        v-for="pagina in paginas" 
-        :key="pagina"
-        class="page-item" 
-        :class="{ active: pagina === paginaAtual }"
+      <li
+        class="page-item"
+        :class="{ disabled: paginaAtual === 1 }"
+        @click="mudarPagina(paginaAtual - 1)"
       >
-        <a class="page-link" href="#" @click.prevent="mudarPagina(pagina)">
-          {{ pagina }}
-        </a>
+        <span class="page-link">Anterior</span>
       </li>
-      
-      <li class="page-item" :class="{ disabled: paginaAtual >= totalPaginas }">
-        <a class="page-link" href="#" @click.prevent="mudarPagina(paginaAtual + 1)">Próximo</a>
+      <li
+        v-for="pagina in paginas"
+        :key="pagina"
+        class="page-item"
+        :class="{ active: pagina === paginaAtual }"
+        @click="mudarPagina(pagina)"
+      >
+        <span class="page-link">{{ pagina }}</span>
+      </li>
+      <li
+        class="page-item"
+        :class="{ disabled: paginaAtual === totalPaginas }"
+        @click="mudarPagina(paginaAtual + 1)"
+      >
+        <span class="page-link">Próximo</span>
       </li>
     </ul>
   </nav>
@@ -25,11 +30,27 @@
 
 <script>
 export default {
-  props: ['paginaAtual', 'totalPaginas', 'paginas'],
+  props: {
+    paginaAtual: {
+      type: Number,
+      required: true,
+    },
+    totalPaginas: {
+      type: Number,
+      required: true,
+    },
+    paginas: {
+      type: Array,
+      required: true,
+    },
+  },
   methods: {
     mudarPagina(pagina) {
-      this.$emit('mudar-pagina', pagina);
-    }
-  }
+      if (pagina > 0 && pagina <= this.totalPaginas) {
+        this.$emit('mudar-pagina', pagina);
+      }
+    },
+  },
 };
 </script>
+
