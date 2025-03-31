@@ -55,12 +55,16 @@ Nota: Você pode executar os scripts diretamente no **PowerShell** ou no **Promp
 #### No **Prompt de Comando (cmd)**:
 Execute o script com:
 ```cmd
+net start MySQL
+mysql -u root -p -e "CREATE DATABASE ans_db;"
 mysql -u root -p ans_db < scripts\criar_tabelas.sql
 ```
 
 #### No **PowerShell**:
 Use o comando `Get-Content` para redirecionar o conteúdo do arquivo:
 ```powershell
+Start-Service MySQL
+mysql -u root -p -e "CREATE DATABASE ans_db;"
 Get-Content .\scripts\criar_tabelas.sql | mysql -u root -p ans_db
 ```
 
@@ -79,8 +83,6 @@ Use o comando `Get-Content`:
 ```powershell
 Get-Content .\scripts\importar_dados.sql | mysql -u root -p ans_db
 ```
-
----
 
 ### 3. Consultas
 
