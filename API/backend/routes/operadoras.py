@@ -60,7 +60,14 @@ def buscar_operadoras():
 
     try:
         # Filtrar os dados com base no termo de busca
-        resultados = df[df.apply(lambda row: termo in str(row).lower(), axis=1)]
+        resultados = df[df.apply(
+            lambda row: termo in str(row['Razao_Social']).lower() or
+                        termo in str(row['Nome_Fantasia']).lower() or
+                        termo in str(row['Cidade']).lower() or
+                        termo in str(row['UF']).lower() or
+                        termo in str(row['Modalidade']).lower(),
+            axis=1
+        )]
         resultados = resultados.sort_values(by=sort_field, ascending=(sort_order == 'asc'))
 
         # Paginação
@@ -81,8 +88,6 @@ def buscar_operadoras():
                     record[col] = value
             records.append(record)
 
-        print(f"Enviando {len(records)} registros da busca para o frontend")
-        
         return jsonify({
             "total": total,
             "totalPages": (total // limit) + (1 if total % limit > 0 else 0),
