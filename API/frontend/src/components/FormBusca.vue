@@ -25,20 +25,7 @@
             Busca por Razão Social, Nome Fantasia, Cidade, UF ou Modalidade
           </small>
         </div>
-
-        <!-- Campo de ordenação -->
-        <div class="col-md-4">
-          <select 
-            class="form-select" 
-            :value="ordenacao" 
-            @change="$emit('update:ordenacao', $event.target.value)"
-          >
-            <option value="Razao_Social|asc">Razão Social (A-Z)</option>
-            <option value="Razao_Social|desc">Razão Social (Z-A)</option>
-            <option value="Cidade|asc">Cidade (A-Z)</option>
-            <option value="UF|asc">Estado (A-Z)</option>
-          </select>
-        </div>
+        
       </div>
     </div>
   </div>
