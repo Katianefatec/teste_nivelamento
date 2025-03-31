@@ -33,5 +33,18 @@ O repositório é organizado em três principais componentes:
 
 ## 🛠️ Estrutura do Repositório
 
-. ├── API/ # Projeto da API │ ├── backend/ # Backend em Flask │ ├── frontend/ # Frontend em Vue.js │ └── postman/ # Coleção Postman ├── BD/ # Banco de Dados │ ├── dados/ # Arquivos CSV para importação │ ├── scripts/ # Scripts SQL │ └── consultas/ # Consultas SQL ├── WebScraping/ # Scripts de automação │ └── baixa_pdf.py # Script para download de PDFs └── README.md # Este arquivo
-
+```
+.
+├── API/       # Projeto da API
+│   ├── backend/  # Backend em Flask
+│   ├── frontend/ # Frontend em Vue.js
+│   └── postman/  # Coleção Postman
+├── BD/        # Banco de Dados
+│   ├── dados/    # Arquivos CSV para importação
+│   ├── scripts/  # Scripts SQL
+│   └── consultas/ # Consultas SQL
+├── WebScraping/ # Scripts de automação
+│   └── baixa_pdf.py # Script para download de PDFs
+|   └── extrai_dados.py # Script para extração de dados para CSV
+└── README.md   # Este arquivo
+```
