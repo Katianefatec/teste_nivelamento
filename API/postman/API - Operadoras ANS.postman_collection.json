@@ -1,0 +1,19 @@
+{
+	"info": {
+		"_postman_id": "644d42e6-6c73-4a30-a7a8-12f1ad81b8ad",
+		"name": "API - Operadoras ANS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "43571307",
+		"_collection_link": "https://katiane-9027296.postman.co/workspace/7efdc480-eb29-4890-837f-c07acf4eb731/collection/43571307-644d42e6-6c73-4a30-a7a8-12f1ad81b8ad?action=share&source=collection_link&creator=43571307"
+	},
+	"item": [
+		{
+			"name": "Listar operadoras",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}
